@@ -2,6 +2,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class ATM {
     private BigDecimal money;
@@ -9,6 +10,12 @@ public class ATM {
 
     public ATM(BigDecimal money){
         this.money = money;
+    }
+
+
+    public ATM(BigDecimal money, Map<Integer, Integer> banknotes) {
+        this.money = money;
+        this.banknotes = banknotes;
     }
 
     public void setMoney(BigDecimal money){
@@ -27,31 +34,32 @@ public class ATM {
         return banknotes;
     }
 
-    public BigDecimal topUp(BigDecimal useMoney){
+    public BigDecimal topUpMoney(BigDecimal useMoney){
         this.money = this.money.add(useMoney);
         return this.money;
     }
 
-    public BigDecimal withdraw(BigDecimal useMoney) {
+    public BigDecimal withdrawMoney(BigDecimal useMoney) {
         this.money = this.money.subtract(useMoney);
         return this.money;
     }
 
-    public void record(){
+    public void recordFile(){
         try {
             File file = new File("MoneyATM.txt"); //
             if (!file.exists()) file.createNewFile();
             PrintWriter pw = new PrintWriter(file);
-            for (Map.Entry<Integer, Integer> entry : this.banknotes.entrySet()) {
+            Map<Integer, Integer> sortedMap = new TreeMap<>(this.banknotes);
+            for (Map.Entry<Integer, Integer> entry :sortedMap.entrySet()) {
                 pw.println(entry.getKey() + ", " + entry.getValue());
             }
             pw.close();
         } catch (IOException ex){
-            System.out.println("Сфеср"); // TODO: message
+            System.out.println("Ошибка записи файла. " + ex);
         }
     }
 
-    public Map<Integer, Integer> read(){
+    public Map<Integer, Integer> readFile(){
         Map<Integer, Integer> banknotes = new HashMap<>();
         BufferedReader br = null;
         try {
@@ -68,8 +76,9 @@ public class ATM {
                 }
             }
             countingMoney(banknotes);
+            banknotes = new TreeMap<>(banknotes);
         }catch(IOException ex){
-            System.out.println("Сфеср"); // TODO: message
+            System.out.println("Ошибка чтения файла. " + ex);
         }
         return this.banknotes = banknotes;
     }
@@ -95,54 +104,46 @@ public class ATM {
     public BigDecimal countingMoney(Map<Integer, Integer> banknotes){
         BigDecimal useMoney = BigDecimal.ZERO;
         for (Map.Entry<Integer, Integer> entry : banknotes.entrySet()) {
-//            System.out.println(entry.getKey() + ", " + entry.getValue());
             useMoney = useMoney.add(BigDecimal.valueOf(entry.getKey()).multiply(BigDecimal.valueOf(entry.getValue())));
-//            System.out.println(useMoney);
         }
         return this.money = useMoney;
     }
 
-    // Сравнение и вычитание двух словарей
-    public Map<Integer, Integer> compareAndSubtract(Map<Integer, Integer> dict2) {
-        Map<Integer, Integer> result = new HashMap<>(this.banknotes);
-        Integer key;
-        Integer valueToSubtract;
+    public Map<Integer, Integer> SubtractMap(Map<Integer, Integer> useBanknotesMap) {
+        Map<Integer, Integer> resultMap = new HashMap<>(this.banknotes);
+        Integer key, value;
 
-        // Проверяем, возможно ли вычитание
-        for (Map.Entry<Integer, Integer> entry : dict2.entrySet()) {
+        for (Map.Entry<Integer, Integer> entry : useBanknotesMap.entrySet()) {
             key = entry.getKey();
-            valueToSubtract = entry.getValue();
+            value = entry.getValue();
 
-            // Если ключ существует в первом словаре, проверяем, не станет ли значение отрицательным
-            if (result.containsKey(key)) {
-                int newValue = result.get(key) - valueToSubtract;
-                if (newValue < 0) {
+            if (resultMap.containsKey(key)) {
+                int sumKeyValue = resultMap.get(key) - value;
+                if (sumKeyValue < 0) {
                     return null;
                 }
+                resultMap.put(key, sumKeyValue);
             }
         }
-
-        for (Map.Entry<Integer, Integer> entry : dict2.entrySet()) {
-            key = entry.getKey();
-            valueToSubtract = entry.getValue();
-
-            result.merge(key, -valueToSubtract, (oldValue, subtractValue) -> Math.max(oldValue + subtractValue, 0));
-        }
-
-        return result;
+        return resultMap;
     }
 
 
     public static void main(String[] args) {
-        ATM myATM = new ATM(null);
-        BigDecimal money = BigDecimal.ZERO;
-        // Перебор элементов
-        myATM.read();
-        System.out.println(myATM.getMoney());
-        myATM.record();
 
-        for (Map.Entry<Integer, Integer> entry : myATM.getBanknotes().entrySet()) {
-            System.out.println(entry.getKey() + ", " + entry.getValue());
+        Map<Integer, Integer> mapOne = new HashMap<>();
+        mapOne.put(50, 5);
+        mapOne.put(100, 7);
+        mapOne.put(15, 7);
+
+
+        System.out.println("mapTwo");
+        for (Map.Entry<Integer, Integer> entry : mapOne.entrySet()){
+            System.out.println(entry.getKey() + " " + entry.getValue());
+        }
+        Map<Integer, Integer> sortedMap = new TreeMap<>(mapOne);
+        for (Map.Entry<Integer, Integer> entry : sortedMap.entrySet()){
+            System.out.println(entry.getKey() + " " + entry.getValue());
         }
     }
 }
