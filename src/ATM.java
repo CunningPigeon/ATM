@@ -5,29 +5,32 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class ATM {
-    private BigDecimal money;
+    private BigDecimal countMoney;
     private Map<Integer, Integer> banknotes;
 
     public ATM(BigDecimal money){
-        this.money = money;
+        this.countMoney = money;
     }
 
 
     public ATM(BigDecimal money, Map<Integer, Integer> banknotes) {
-        this.money = money;
+        this.countMoney = money;
         this.banknotes = banknotes;
     }
 
-    public void setMoney(BigDecimal money){
-        this.money = money;
+    public ATM() {
+    }
+
+    public void setCountMoney(BigDecimal countMoney){
+        this.countMoney = countMoney;
     }
 
     public void setBanknotes(Map<Integer, Integer> banknotes) {
         this.banknotes = banknotes;
     }
 
-    public BigDecimal getMoney() {
-        return money;
+    public BigDecimal getCountMoney() {
+        return countMoney;
     }
 
     public Map<Integer, Integer> getBanknotes() {
@@ -35,13 +38,13 @@ public class ATM {
     }
 
     public BigDecimal topUpMoney(BigDecimal useMoney){
-        this.money = this.money.add(useMoney);
-        return this.money;
+        this.countMoney = this.countMoney.add(useMoney);
+        return this.countMoney;
     }
 
     public BigDecimal withdrawMoney(BigDecimal useMoney) {
-        this.money = this.money.subtract(useMoney);
-        return this.money;
+        this.countMoney = this.countMoney.subtract(useMoney);
+        return this.countMoney;
     }
 
     public void recordFile(){
@@ -92,7 +95,7 @@ public class ATM {
         return this.banknotes = result;
     }
 
-    public Map<Integer, Integer> withdrawMap(Map<Integer, Integer> useBanknotes){
+    public Map<Integer, Integer> withdrawBanknotes(Map<Integer, Integer> useBanknotes){
         Map<Integer, Integer> result = new HashMap<>(this.banknotes);
 
         for (Map.Entry<Integer, Integer> entry : useBanknotes.entrySet()) {
@@ -106,10 +109,10 @@ public class ATM {
         for (Map.Entry<Integer, Integer> entry : banknotes.entrySet()) {
             useMoney = useMoney.add(BigDecimal.valueOf(entry.getKey()).multiply(BigDecimal.valueOf(entry.getValue())));
         }
-        return this.money = useMoney;
+        return this.countMoney = useMoney;
     }
 
-    public Map<Integer, Integer> SubtractMap(Map<Integer, Integer> useBanknotesMap) {
+    public Map<Integer, Integer> subtractBanknotes(Map<Integer, Integer> useBanknotesMap) {
         Map<Integer, Integer> resultMap = new HashMap<>(this.banknotes);
         Integer key, value;
 
@@ -120,7 +123,7 @@ public class ATM {
             if (resultMap.containsKey(key)) {
                 int sumKeyValue = resultMap.get(key) - value;
                 if (sumKeyValue < 0) {
-                    return null;
+                    return new HashMap<>();
                 }
                 resultMap.put(key, sumKeyValue);
             }

@@ -24,6 +24,8 @@ public class UserDetails {
         this.balance = balance;
     }
 
+    public UserDetails() {}
+
     public Long getId() {
         return id;
     }
@@ -120,6 +122,32 @@ public class UserDetails {
         }
 
         return this.arrUserdetails = parts;
+    }
+
+
+    public boolean isValidCardNumber (String cardNumber) {
+        int charSum = 0;
+        for (int i = cardNumber.length() - 1; i >= 0; i--){
+            int charSym = Character.getNumericValue(cardNumber.charAt(i));
+            if ((cardNumber.length() - 1 - i) % 2 == 1) {
+                charSym = charSym * 2;
+                charSym = (charSym > 9) ? charSym - 9 : charSym;
+            }
+            charSum += charSym;
+        }
+        if(charSum % 10 == 0) {
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public static void main(String[] args) {
+        UserDetails myUser = new UserDetails();
+        System.out.println(myUser.isValidCardNumber("5062821734567892"));
+        System.out.println(myUser.isValidCardNumber("5062821234567892"));
+
     }
 }
 

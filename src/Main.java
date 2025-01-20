@@ -1,42 +1,39 @@
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.PrintWriter;
 import java.math.BigDecimal;
-import java.sql.SQLOutput;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.io.IOException;
 import java.util.TreeMap;
 
 
 class Main {
     public static void main(String[] args) {
-        ATM myATM = new ATM(null);
+        ATM myATM = new ATM();
         Map<Integer, Integer> banknotesMap = new HashMap<>();
 
         BufferedReader br = null;
-        UserDetails myUser = new UserDetails(null, null, null, null);
+        UserDetails myUser = new UserDetails();
         myUser.readFile();
         String[] arrUsers = myUser.getArrUserdetails();
         Scanner scanner = new Scanner(System.in);
         int input;
+        BigInteger inputBigInteger;
         int inputTwo;
         BigDecimal useMoney = BigDecimal.ZERO;
         boolean loopOne = true, loopTwo = true;
 
 
         while(loopOne){
-
             try {
                 System.out.print("Введите номер карты/счета: ");
-                input = scanner.nextInt();
+                inputBigInteger = scanner.nextBigInteger();
+                if(!myUser.isValidCardNumber(String.valueOf(inputBigInteger))) throw new Exception();
                 System.out.print("Введите PIN карты/счета: ");
                 inputTwo = scanner.nextInt();
                 for(String arrUser : arrUsers) {
                     String[] user = arrUser.split(",\\s*");
-                    if (String.valueOf(input).equals(user[2])) {
+                    if (String.valueOf(inputBigInteger).equals(user[2])) {
                         if(String.valueOf(inputTwo).equals(user[3])){
                             long id = Long.valueOf(user[0]);
                             String fullname = user[1];
@@ -72,7 +69,7 @@ class Main {
                 }
                 banknotesMap = new TreeMap<>(banknotesMap);
 
-                BigDecimal moneyATM = myATM.getMoney();
+                BigDecimal moneyATM = myATM.getCountMoney();
                 input = scanner.nextInt();
 
                 switch (input) {
@@ -156,9 +153,10 @@ class Main {
                             System.out.println("Ошибка: сумма купюр не соответствует сумме снятия.");
                             break;
                         }
-                        Map<Integer, Integer> result = myATM.SubtractMap(banknotesMap);
+                        Map<Integer, Integer> result;
+                        result = myATM.subtractBanknotes(banknotesMap);
 
-                        if (result == null) {
+                        if (result.isEmpty()) {
                             System.out.println("Ошибка: Снятие невозможно, не хватает банкнот.");
                             break;
                         }
@@ -172,7 +170,7 @@ class Main {
                             myUser.withdraw(withdraw);
                             myUser.recordFile();
                             myATM.withdrawMoney(withdraw);
-                            myATM.withdrawMap(banknotesMap);
+                            myATM.withdrawBanknotes(banknotesMap);
                             myATM.recordFile();
                         }
                         break;
