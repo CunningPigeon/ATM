@@ -38,11 +38,23 @@ public class ATM {
     }
 
     public BigDecimal topUpMoney(BigDecimal useMoney){
+        if (useMoney == null) {
+            throw new IllegalArgumentException("Ошибка: сумма для пополнения не может быть null.");
+        }
         this.countMoney = this.countMoney.add(useMoney);
         return this.countMoney;
     }
 
     public BigDecimal withdrawMoney(BigDecimal useMoney) {
+        if (useMoney == null) {
+            throw new IllegalArgumentException("Ошибка: сумма для снятия не может быть null.");
+        }
+        if (useMoney.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Ошибка: сумма для снятия не может быть отрицательной.");
+        }
+        if (useMoney.compareTo(this.countMoney) > 0) {
+            throw new IllegalArgumentException("Ошибка: недостаточно средств для снятия.");
+        }
         this.countMoney = this.countMoney.subtract(useMoney);
         return this.countMoney;
     }
@@ -62,6 +74,7 @@ public class ATM {
         }
     }
 
+    /*
     public Map<Integer, Integer> readFile(){
         Map<Integer, Integer> banknotes = new HashMap<>();
         BufferedReader br = null;
@@ -84,7 +97,7 @@ public class ATM {
             System.out.println("Ошибка чтения файла. " + ex);
         }
         return this.banknotes = banknotes;
-    }
+    }*/
 
     public Map<Integer, Integer> topUpMap(Map<Integer, Integer> useBanknotes){
         Map<Integer, Integer> result = new HashMap<>(this.banknotes);
@@ -102,6 +115,27 @@ public class ATM {
             result.merge(entry.getKey(), -entry.getValue(), Integer::sum);
         }
         return this.banknotes = result;
+    }
+
+    public Map<Integer, Integer> processingAnArrayOfData(String[] arrayOfData){
+        Map<Integer, Integer> banknotes = new HashMap<>();
+        try{
+            for (int i = 0; i < arrayOfData.length; i++) {
+                String[] parts = arrayOfData[i].trim().split(",\\s*");
+
+                if (parts.length == 2) {
+                    Integer kup = Integer.parseInt(parts[0]);
+                    Integer count = Integer.parseInt(parts[1]);
+
+                    banknotes.put(kup, count);
+                }
+            }
+            countingMoney(banknotes);
+            banknotes = new TreeMap<>(banknotes);
+        }catch(Exception ex){
+            System.out.println("Ошибка: " + ex);
+        }
+        return this.banknotes = banknotes;
     }
 
     public BigDecimal countingMoney(Map<Integer, Integer> banknotes){
@@ -139,6 +173,11 @@ public class ATM {
         mapOne.put(100, 7);
         mapOne.put(15, 7);
 
+        FileHandler handler = new FileHandler();
+        String[] array = handler.readFile(handler.getFILE_NAME_USERDETAILS());
+
+        ATM atm = new ATM();
+        atm.processingAnArrayOfData(array);
 
         System.out.println("mapTwo");
         for (Map.Entry<Integer, Integer> entry : mapOne.entrySet()){

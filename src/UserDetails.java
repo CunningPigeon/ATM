@@ -9,19 +9,22 @@ public class UserDetails {
     private BigDecimal balance;
     private String[] arrUserdetails;
 
+    public UserDetails(Long id, String fullName, String cardNumber, int pin, BigDecimal balance, String[] arrUserdetails) {
+        this.id = id;
+        this.fullName = fullName;
+        this.cardNumber = cardNumber;
+        this.pin = pin;
+        this.balance = balance;
+        this.arrUserdetails = arrUserdetails;
+    }
+
     public UserDetails(Long id, String fullName, String cardNumber, int pin, BigDecimal balance) {
         this.id = id;
         this.fullName = fullName;
         this.cardNumber = cardNumber;
         this.pin = pin;
         this.balance = balance;
-    }
 
-    public UserDetails(Long id, String fullName, String cardNumber, BigDecimal balance) {
-        this.id = id;
-        this.fullName = fullName;
-        this.cardNumber = cardNumber;
-        this.balance = balance;
     }
 
     public UserDetails() {}
@@ -107,7 +110,7 @@ public class UserDetails {
             System.out.println("Ошибка записи файла." + ex);
         }
     }
-
+    /*
     public String[] readFile(){
         String[] parts = new String[0];
 
@@ -122,8 +125,7 @@ public class UserDetails {
         }
 
         return this.arrUserdetails = parts;
-    }
-
+    }*/
 
     public boolean isValidCardNumber (String cardNumber) {
         int charSum = 0;
